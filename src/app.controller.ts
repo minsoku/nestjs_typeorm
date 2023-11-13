@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserModel } from './entity/user.entity';
 import { Repository } from 'typeorm';
 import { ProfileModel } from './entity/profile.entity';
+import { PostModel } from './entity/post.entity';
+import { TagModel } from './entity/tag.entity';
 
 @Controller()
 export class AppController {
@@ -11,6 +13,10 @@ export class AppController {
     private readonly userRepository: Repository<UserModel>,
     @InjectRepository(ProfileModel)
     private readonly profileRepository: Repository<ProfileModel>,
+    @InjectRepository(PostModel)
+    private readonly postRepository: Repository<PostModel>,
+    @InjectRepository(TagModel)
+    private readonly tagRepository: Repository<TagModel>,
   ) {}
 
   @Post('users')
@@ -23,6 +29,7 @@ export class AppController {
     return this.userRepository.find({
       relations: {
         profile: true,
+        posts: true,
       },
     });
   }
@@ -51,5 +58,64 @@ export class AppController {
     });
 
     return user;
+  }
+
+  @Post('user/post')
+  async createUserAndPosts() {
+    const user = await this.userRepository.save({
+      email: 'post@gmail.com',
+    });
+
+    await this.postRepository.save({
+      author: user,
+      title: 'post 1',
+    });
+
+    await this.postRepository.save({
+      author: user,
+      title: 'post 2',
+    });
+
+    return user;
+  }
+  @Post('posts/tags')
+  async createPostsTags() {
+    const post1 = await this.postRepository.save({
+      title: 'nestjs',
+    });
+    const post2 = await this.postRepository.save({
+      title: 'programming',
+    });
+
+    const tag1 = await this.tagRepository.save({
+      name: 'js',
+      posts: [post1, post2],
+    });
+    const tag2 = await this.tagRepository.save({
+      name: 'ts',
+      posts: [post1],
+    });
+    const post3 = await this.postRepository.save({
+      title: 'nextjs',
+      tags: [tag1, tag2],
+    });
+
+    return true;
+  }
+  @Get('posts')
+  getPosts() {
+    return this.postRepository.find({
+      relations: {
+        tags: true,
+      },
+    });
+  }
+  @Get('tags')
+  getTags() {
+    return this.tagRepository.find({
+      relations: {
+        posts: true,
+      },
+    });
   }
 }
