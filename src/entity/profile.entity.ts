@@ -11,8 +11,9 @@ import { UserModel } from './user.entity';
 export class ProfileModel {
   @PrimaryGeneratedColumn()
   id: number;
+
   @OneToOne(() => UserModel, (user) => user.profile)
-  @JoinColumn()
+  // @JoinColumn()
   user: UserModel;
 
   @Column()
