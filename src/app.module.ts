@@ -11,10 +11,11 @@ import {
   ComputerModel,
   SingleBaseModel,
 } from './entity/inheritance.entity';
+import { ProfileModel } from './entity/profile.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserModel]),
+    TypeOrmModule.forFeature([UserModel, ProfileModel]),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: '127.0.0.1',
@@ -31,6 +32,7 @@ import {
         ComputerModel,
         AirPlaneModel,
         SingleBaseModel,
+        ProfileModel,
       ],
       synchronize: true,
     }),
