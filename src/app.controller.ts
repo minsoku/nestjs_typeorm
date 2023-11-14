@@ -6,6 +6,7 @@ import {
   Equal,
   ILike,
   In,
+  IsNull,
   LessThan,
   LessThanOrEqual,
   Like,
@@ -30,6 +31,87 @@ export class AppController {
     @InjectRepository(TagModel)
     private readonly tagRepository: Repository<TagModel>,
   ) {}
+
+  @Post('sample')
+  async sample() {
+    // 모델에 해당되는 객체 생성 - 저장은 안 함
+    // const user1 = this.userRepository.create({
+    //   email: 'test@gmail.com',
+    // });
+    // 저장
+    // const user2 = this.userRepository.save({
+    //   email: 'test@naver.com',
+    // });
+
+    // preload
+    // 입력된 값을 기반으로 데이터베이스에 있는 데이터를 불러오고
+    // 추가 입력된 값으로 데이터베이스에서 가져온 값들을 대체함.
+    // 저장하지는 않음
+
+    // const user3 = await this.userRepository.preload({
+    //   id: 101,
+    //   email: 'minsoku@naver.com',
+    // });
+
+    // await this.userRepository.delete(101);
+
+    // 값을 증가시킴
+    // await this.userRepository.increment(
+    //   {
+    //     id: 3,
+    //   },
+    //   'count',
+    //   2,
+    // );
+
+    // 값을 감소시킴
+    // await this.userRepository.decrement(
+    //   {
+    //     id: 3,
+    //   },
+    //   'count',
+    //   1,
+    // );
+
+    // 갯수 카운팅하기
+    // const count = await this.userRepository.count({
+    //   where: {
+    //     email: ILike('%0%'),
+    //   },
+    // });
+
+    // 합
+    // const sum = await this.userRepository.sum('count', {
+    //   email: ILike('%0%'),
+    // });
+
+    // 평균
+    // const average = await this.userRepository.average('count', {
+    //   id: LessThan(4),
+    // });
+
+    // 최솟값
+    // const min = await this.userRepository.minimum('count', {
+    //   id: LessThan(4),
+    // });
+
+    // 최댓값
+    // const max = await this.userRepository.maximum('count', {
+    //   id: LessThan(4),
+    // });
+
+    // const userOne = await this.userRepository.findOne({
+    //   where: {
+    //     id: 3,
+    //   },
+    // });
+
+    const usersAndCount = await this.userRepository.findAndCount({
+      take: 3,
+    });
+
+    return usersAndCount;
+  }
 
   @Post('users')
   async postUser() {
@@ -63,7 +145,9 @@ export class AppController {
         // 사이값
         // id: Between(1,2)
         // 해당되는 여러개의 값
-        id: In([1, 2, 3]),
+        // id: In([1, 2, 3]),
+        // null인 경우
+        // id: IsNull(),
       },
       // 어떤 프로퍼티를 선택할지
       // 기본은 모든 프로퍼티를 가져온다.
@@ -81,7 +165,7 @@ export class AppController {
       // 필터링 할 조건을 입력
       // 전부다 and 조건
       // where: {
-      //   version: 1,
+      //   id: 1,
       // },
       // or 조건으로 하려면 list로 넣어야함
       // where: [
@@ -99,9 +183,9 @@ export class AppController {
       //오름차순 내림차순
       // ASC
       // DESC
-      // order: {
-      //   id: 'ASC',
-      // },
+      order: {
+        count: 'DESC',
+      },
       // // 처음 몇 개를 제외하는지
       // skip: 1,
       // 몇 개를 가져올지 default 0 전부 다
